@@ -47,11 +47,11 @@ class ChessPieceTravelSolverTest extends FlatSpec with Matchers with OptionValue
     val solution: Option[Path] = WandorfsHeuristicSolver.findTravelSolution(Chequerboard(size), startPosition, Pawn)
     solution should not be None
     solution.get.size should be(size * size)
+    solution.get.distinct.size should be(solution.get.size)
     expectedSolution match {
       case Some(s) =>
         solution.get should be(s)
       case _ =>
-        println("Not expected solution provided")
     }
   }
 
