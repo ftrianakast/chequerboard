@@ -44,10 +44,12 @@ class ChessPieceTravelSolverTest extends FlatSpec with Matchers with OptionValue
   }
 
   def testCorrectSolutionsForAPawnTravel(expectedSolution: Option[Path], size: Int, startPosition: Position) = {
+    val completeCoordinates: Set[Position] = (for (a <- 0 to size; b <- 0 to size) yield Position(a, b)).toSet
     val solution: Option[Path] = WandorfsHeuristicSolver.findTravelSolution(Chequerboard(size), startPosition, Pawn)
     solution should not be None
     solution.get.size should be(size * size)
     solution.get.distinct.size should be(solution.get.size)
+    solution.get.toSet diff completeCoordinates should be(Set.empty)
     expectedSolution match {
       case Some(s) =>
         solution.get should be(s)
