@@ -53,7 +53,51 @@ It will print something like this:
            Position(1,7), Position(4,7), Position(2,5), Position(2,2), Position(5,2),
            Position(5,5), Position(3,3), Position(3,0), Position(0,0), Position(0,3))
 
-That shows in order what are the positions that the pawn needs to follow for solving the problem
+That shows the steps in order that the pawn needs to follow for solving the problem.
+
+
+### How i know this solution is correct?
+
+Because of property based testing. I find the next properties of the problem:
+
+- Existence
+
+Given a solution **s** with type Option[Vector[Position]] for a board of size 10 the next is an equation
+to demonstrate **existence property** of the problem:
+ 
+    - s should not be None 
+
+- Completeness
+
+Given a solution **s** with type Vector[Position] for a board of size **n** the next are equations 
+that needs to be satisfied for demonstrate the **completeness property** of the problem:
+   
+    - n * n = s.size
+    - s.distinct.size = s.size
+    - s.toSet diff completeCoordinates = Set.empty
+        where completeCoordinates are calculated as follows:
+            (for (a <- 0 to s.size; b <- 0 to s.size) yield Position(a, b)).toSet
+    
+- Movement correctness
+
+Given a solution **s** with type Vector[Position] for a board of size **n** and a **p** chess piece with
+delta movements **d** with type Vector[Position], where delta movements codificates how the chess piece
+can move; the next code demonstrate the **movement correctness property** of the problem:
+
+      def testCorrectMovementsProperty(solution: Path, chessPiece: ChessPiece): Path = {
+        def verifyStepsCorrectness(step: Position, nextStep: Position): Boolean = {
+          val delta = Position(nextStep.x - step.x, nextStep.y - step.y)
+          chessPiece.getDeltas contains delta
+        }
+        val adjacentSteps = solution.sliding(2)
+        val movementsCorrectness = adjacentSteps.forall(pairPosition => verifyStepsCorrectness(pairPosition.head, pairPosition(1)))
+        movementsCorrectness should be(true)
+        solution
+      }
+
+The above three properties where codificated and tested in scala class:
+
+    com.truecaller.chequerboard.domain.ChessPieceTravelSolverTest
 
 ### Run Test
 
